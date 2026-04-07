@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshBite · Pinoy Cuisine (with photos)</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f4efe7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .app {
+            width: 1400px;
+            max-width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+            border: 1px solid #ddd2c0;
+        }
+        /* top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            border-bottom: 2px solid #eae0d4;
+            background: white;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            color: #3f352b;
+        }
+        .logo span {
+            color: #ff8a5c;
+            font-weight: 300;
+        }
+        .logo span i {
+            font-style: normal;
+            color: #0038a8; 
+        }
+        .login-chip {
+            background: #cfc1ae;
+            border-radius: 40px;
+            padding: 0.6rem 1.6rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: 2px solid #b09f88;
+            transition: 0.15s;
+        }
+        .login-chip:hover {
+            background: #b09f88;
+            color: white;
+        }
+        /* login drawer */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(3px);
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 998;
+        }
+        .drawer-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .login-drawer {
+            position: fixed;
+            top: 0; right: -460px;
+            width: 420px; height: 100%;
+            background: white;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            z-index: 999;
+            transition: right 0.4s;
+            padding: 2rem 2rem;
+            border-left: 2px solid #dacdb9;
+        }
+        .login-drawer.open { right: 0; }
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .drawer-header h2 { color: #3f352b; }
+        .close-drawer {
+            background: none; border: none;
+            font-size: 2.2rem; cursor: pointer;
+            color: #9a8978;
+        }
+        .login-form label {
+            font-weight: 600; color: #4d3f32;
+            margin-top: 1.2rem; display: block;
+        }
+        .login-form input {
+            width: 100%; padding: 1rem;
+            border-radius: 3rem; border: 1px solid #cfc1ae;
+            margin: 0.4rem 0 1rem; background: #fcf9f4;
+        }
+        .login-btn {
+            background: #ff8a5c; color: white;
+            border: none; width: 100%; padding: 1rem;
+            border-radius: 3rem; font-weight: 700; font-size: 1.1rem;
+            cursor: pointer; margin-top: 1rem;
+        }
+        .login-btn:hover { background: #e6734c; }
+
+        /* dashboard */
+        .dashboard {
+            display: flex;
+            min-height: 620px;
+        }
+        /* left menu */
+        .left-menu {
+            width: 280px;
+            background: #fcf9f5;
+            border-right: 2px solid #e7ddd0;
+            padding: 2rem 1.2rem 2rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .menu-section p {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #ab9a86;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.7rem 1.2rem;
+            margin-right: 0.8rem;
+            border-radius: 40px;
+            color: #4a4139;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s;
+            border: 1px solid transparent;
+        }
+        .menu-item i {
+            width: 1.6rem;
+            color: #ff8a5c;
+        }
+        .menu-item.active {
+            background: #ffe3d6;
+            border-color: #ffb99a;
+            font-weight: 700;
+            color: #2f2a24;
+        }
+        .menu-item:hover:not(.active) {
+            background: #f0e8de;
+        }
+        .diet-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding-right: 0.8rem;
+        }
+        .diet-chip {
+            background: white;
+            border: 1px solid #d0bfab;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+        .diet-chip i { color: #2ecc71; }
+
+        /* central */
+        .central-content {
+            flex: 1;
+            padding: 2rem 2.2rem;
+            background: white;
+        }
+        .flow-steps {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            background: #fcf7f0;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            border: 1px solid #decbb6;
+            flex-wrap: wrap;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8f7f6c;
+            font-weight: 500;
+        }
+        .step.active-step {
+            color: #3f352b;
+            font-weight: 700;
+        }
+        .step i {
+            background: #eadaca;
+            padding: 6px;
+            border-radius: 50%;
+        }
+        .step.active-step i {
+            background: #ff8a5c;
+            color: white;
+        }
+
+        /* MEAL CARDS WITH INTERNET PHOTOS */
+        .meal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0 2rem;
+        }
+        .meal-card {
+            background: #fefcf9;
+            border: 2px solid #e2d6c6;
+            border-radius: 2rem;
+            padding: 1.2rem 1rem 1.2rem;
+            transition: transform 0.15s, box-shadow 0.2s, border-color 0.1s;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .meal-card:hover {
+            transform: translateY(-6px);
+            border-color: #ffb08a;
+            box-shadow: 0 18px 25px -12px #ff8a5c80;
+        }
+        .meal-card.selected {
+            border-color: #ff8a5c;
+            border-width: 3px;
+            background: #fff7f0;
+            box-shadow: 0 10px 20px -8px #e6734c;
+        }
+        .meal-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 12px; right: 16px;
+            background: #ff8a5c;
+            color: white;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* photo styling */
+        .meal-photo {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 1.4rem;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 0.8rem;
+            background: #e2d6c6; /* fallback */
+        }
+        .meal-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #4a3f35;
+            margin: 0.3rem 0 0.1rem;
+        }
+        .meal-desc {
+            font-size: 0.8rem;
+            color: #7f6e5b;
+            margin-bottom: 0.6rem;
+        }
+        .macro-row {
+            display: flex;
+            justify-content: space-between;
+            background: #efe6db;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #3a332b;
+        }
+        .macro-row span { display: flex; gap: 4px; align-items: center; }
+
+        .delivery-row {
+            background: #faf4eb;
+            border-radius: 4rem;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #dacdb9;
+            margin: 2rem 0 1.5rem;
+        }
+        .view-macros-btn {
+            background: #3f352b;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: default;
+        }
+        .macro-summary {
+            background: #e7dccd;
+            border-radius: 4rem;
+            padding: 1.5rem 2.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            border: 2px solid #cdbca4;
+        }
+        .macro-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .macro-item i { font-size: 2rem; color: #b4815c; }
+        .macro-number { font-size: 2rem; font-weight: 700; color: #4d3929; }
+
+        .selection-feedback {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #4f4a43;
+            background: #f0e8de;
+            padding: 0.6rem 1.2rem;
+            border-radius: 3rem;
+            display: inline-block;
+        }
+        .footer-note {
+            text-align: right;
+            color: #ab9b88;
+            margin-top: 1.2rem;
+        }
+        /* fallback text if images slow */
+        .photo-alt-note {
+            font-size: 0.7rem; color: #a79a8a; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="top-bar">
+        <div class="logo">FreshBite <span>Pinoy<span style="color:#ce1126;">🇵🇭</span></span></div>
+        <div class="login-chip" id="loginOpenBtn">
+            <i class="fa-regular fa-user"></i> Sign in
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard">
+        <!-- LEFT MENU -->
+        <div class="left-menu">
+            <div class="menu-section">
+                <p>🍽️ DIET PREFERENCES</p>
+                <div class="menu-item active"><i class="fa-solid fa-leaf"></i> Balanced</div>
+                <div class="menu-item"><i class="fa-solid fa-bolt"></i> High protein</div>
+                <div class="menu-item"><i class="fa-solid fa-wheat-awn"></i> Low carb</div>
+                <div class="menu-item"><i class="fa-solid fa-seedling"></i> Vegan</div>
+                <div class="diet-tags">
+                    <span class="diet-chip"><i class="fa-regular fa-circle-check"></i> Keto</span>
+                    <span class="diet-chip"><i class="fa-regular fa-clock"></i> Quick prep</span>
+                </div>
+            </div>
+            <div class="menu-section">
+                <p>📅 PLAN</p>
+                <div class="menu-item"><i class="fa-regular fa-calendar"></i> Weekly</div>
+                <div class="menu-item"><i class="fa-regular fa-calendar-check"></i> Bi-Weekly</div>
+                <div class="menu-item"><i class="fa-solid fa-box"></i> Subscription</div>
+            </div>
+            <div class="menu-section">
+                <p>💳 BILLING</p>
+                <div class="menu-item"><i class="fa-regular fa-credit-card"></i> Payment</div>
+                <div class="menu-item"><i class="fa-regular fa-receipt"></i> Invoices</div>
+            </div>
+        </div>
+
+        <!-- CENTRAL: FILIPINO MEALS WITH PHOTOS FROM THE INTERNET -->
+        <div class="central-content">
+            <div class="flow-steps">
+                <div class="step active-step"><i class="fa-regular fa-circle-check"></i> 1. Diet type</div>
+                <div class="step active-step"><i class="fa-regular fa-circle-check"></i> 2. Weekly meals</div>
+                <div class="step"><i class="fa-regular fa-circle"></i> 3. Delivery</div>
+                <div class="step"><i class="fa-regular fa-star"></i> 4. Macros</div>
+            </div>
+
+            <!-- MEAL GRID WITH ONLINE IMAGES (all from wikimedia / pexels / placeholder but real food) -->
+            <div class="meal-grid" id="mealGrid">
+                <!-- adobo -->
+                <div class="meal-card" data-id="adobo">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/3/32/Chicken_adobo.jpg" alt="Chicken Adobo" loading="lazy">
+                    <div class="meal-title">Chicken Adobo</div>
+                    <div class="meal-desc">soy-garlic vinegar, bay leaf</div>
+                    <div class="macro-row"><span>28g F</span><span>12g C</span><span>42g P</span></div>
+                </div>
+                <!-- sinigang -->
+                <div class="meal-card" data-id="sinigang">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Sinigang_na_Baboy_%28Philippines%29.jpg" alt="Pork Sinigang" loading="lazy">
+                    <div class="meal-title">Pork Sinigang</div>
+                    <div class="meal-desc">tamarind broth, kangkong</div>
+                    <div class="macro-row"><span>18g F</span><span>16g C</span><span>34g P</span></div>
+                </div>
+                <!-- sisig -->
+                <div class="meal-card" data-id="sisig">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/4/43/Sisig_%282%29.jpg" alt="Sisig" loading="lazy">
+                    <div class="meal-title">Sisig</div>
+                    <div class="meal-desc">sizzling pork, chili, onion</div>
+                    <div class="macro-row"><span>38g F</span><span>9g C</span><span>28g P</span></div>
+                </div>
+                <!-- kare-kare -->
+                <div class="meal-card" data-id="kare-kare">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Kare_kare_oxtail_and_tripe.jpg" alt="Kare-Kare" loading="lazy">
+                    <div class="meal-title">Kare‑Kare</div>
+                    <div class="meal-desc">peanut stew, oxtail, bagoong</div>
+                    <div class="macro-row"><span>32g F</span><span>22g C</span><span>36g P</span></div>
+                </div>
+                <!-- lechon kawali -->
+                <div class="meal-card" data-id="lechon-kawali">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/4/45/Lechon_kawali.jpg" alt="Lechon Kawali" loading="lazy">
+                    <div class="meal-title">Lechon Kawali</div>
+                    <div class="meal-desc">crispy belly, liver sauce</div>
+                    <div class="macro-row"><span>46g F</span><span>2g C</span><span>26g P</span></div>
+                </div>
+                <!-- tinola -->
+                <div class="meal-card" data-id="tinolang-manok">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Tinolang_manok_05.jpg" alt="Tinolang Manok" loading="lazy">
+                    <div class="meal-title">Tinolang Manok</div>
+                    <div class="meal-desc">ginger chicken, sayote</div>
+                    <div class="macro-row"><span>14g F</span><span>10g C</span><span>38g P</span></div>
+                </div>
+                <!-- bicol express -->
+                <div class="meal-card" data-id="bicol-express">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Bicol_Express_%281%29.jpg" alt="Bicol Express" loading="lazy">
+                    <div class="meal-title">Bicol Express</div>
+                    <div class="meal-desc">coconut milk, labuyo</div>
+                    <div class="macro-row"><span>34g F</span><span>13g C</span><span>24g P</span></div>
+                </div>
+                <!-- lumpia -->
+                <div class="meal-card" data-id="lumpia">
+                    <img class="meal-photo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Filipino_Lumpia_Shanghai.jpg/800px-Filipino_Lumpia_Shanghai.jpg" alt="Lumpia Shanghai" loading="lazy">
+                    <div class="meal-title">Lumpia Shanghai</div>
+                    <div class="meal-desc">fried spring rolls, sweet chili</div>
+                    <div class="macro-row"><span>24g F</span><span>28g C</span><span>16g P</span></div>
+                </div>
+            </div>
+
+            <!-- selection feedback (Tagalog / English) -->
+            <div id="selectedFeedback" class="selection-feedback">
+                <i class="fa-regular fa-hand-pointer"></i> Pumili ng putahe (click to choose). Napili: <span id="selectedCount">0</span>
+            </div>
+
+            <!-- delivery row & macros -->
+            <div class="delivery-row">
+                <span><i class="fa-regular fa-map"></i> 📍 123 Taft Ave, Manila (change)</span>
+                <span class="view-macros-btn"><i class="fa-regular fa-chart-bar"></i> VIEW MACROS →</span>
+            </div>
+            <div class="macro-summary">
+                <div class="macro-item"><i class="fa-regular fa-fire"></i> <span class="macro-number">2,150</span> kcal</div>
+                <div class="macro-item"><i class="fa-regular fa-dumbbell"></i> <span class="macro-number">142g</span> protein</div>
+                <div class="macro-item"><i class="fa-regular fa-bread-slice"></i> <span class="macro-number">188g</span> carbs</div>
+                <div class="macro-item"><i class="fa-regular fa-oil-can"></i> <span class="macro-number">92g</span> fat</div>
+            </div>
+            <div class="footer-note">⚡ Sarap! authentic Filipino dishes with photos</div>
+        </div>
+    </div>
+</div>
+
+<!-- login drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="login-drawer" id="loginDrawer">
+    <div class="drawer-header">
+        <h2><i class="fa-regular fa-user"></i> Maligayang pagdating</h2>
+        <button class="close-drawer" id="closeDrawerBtn"><i class="fa-regular fa-circle-xmark"></i></button>
+    </div>
+    <div class="login-form">
+        <label>Email</label>
+        <input type="email" value="kusina@freshbite.ph">
+        <label>Password</label>
+        <input type="password" value="adobo321">
+        <button class="login-btn"><i class="fa-regular fa-arrow-right-to-bracket"></i> Sign in</button>
+    </div>
+    <p style="text-align:center; margin-top:2rem; color:#9a8978;">⬅️ isara ang drawer</p>
+</div>
+
+<!-- drawer js -->
+<script>
+    (function() {
+        const overlay = document.getElementById('drawerOverlay');
+        const drawer = document.getElementById('loginDrawer');
+        const openBtn = document.getElementById('loginOpenBtn');
+        const closeBtn = document.getElementById('closeDrawerBtn');
+
+        function openDrawer() {
+            overlay.classList.add('active');
+            drawer.classList.add('open');
+        }
+        function closeDrawer() {
+            overlay.classList.remove('active');
+            drawer.classList.remove('open');
+        }
+        if (openBtn) openBtn.addEventListener('click', openDrawer);
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if (overlay) overlay.addEventListener('click', closeDrawer);
+    })();
+</script>
+
+<!-- meal selection script (choose dishes) -->
+<script>
+    (function() {
+        const mealCards = document.querySelectorAll('.meal-card');
+        const selectedSpan = document.getElementById('selectedCount');
+
+        function updateSelectedCount() {
+            const selected = document.querySelectorAll('.meal-card.selected').length;
+            if (selectedSpan) selectedSpan.textContent = selected;
+        }
+
+        mealCards.forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateSelectedCount();
+            });
+        });
+
+        updateSelectedCount();
+    })();
+</script>
+</body>
+</html>

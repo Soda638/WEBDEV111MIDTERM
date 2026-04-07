@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>StockMaster | PH Retail Inventory</title>
+    <!-- Flat, industrial font & simple reset -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: #1a2634;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* MAIN LAYOUT: utility sidebar + main content */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* ========== THICK LEFT SIDEBAR (UTILITY) ========== */
+        .sidebar {
+            width: 280px;
+            background: #1e2a32;
+            color: #e9edf2;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        /* barcode-style logo area */
+        .logo-area {
+            padding: 28px 24px;
+            border-bottom: 1px solid #2b6b80;
+            margin-bottom: 24px;
+        }
+
+        .barcode-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo-sub {
+            font-size: 0.7rem;
+            color: #a0b3c0;
+            margin-top: 4px;
+        }
+
+        /* navigation menu items (utility) */
+        .nav-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #cddfe7;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            background: #2c4b5c;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-item:hover:not(.active) {
+            background: #2a3c44;
+            color: #facc15;
+        }
+
+        /* bottom utility section */
+        .sidebar-footer {
+            padding: 24px 20px 30px;
+            border-top: 1px solid #2c3e44;
+            font-size: 0.8rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        /* ========== MAIN CONTENT (DATA-HEAVY TABLES) ========== */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            background: #f4f7fc;
+        }
+
+        /* top bar with page title + action hints */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e2a32;
+        }
+
+        .page-title p {
+            font-size: 0.85rem;
+            color: #5e727f;
+            margin-top: 4px;
+        }
+
+        /* BOLD ACTION BUTTONS (flat industrial) */
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+        }
+
+        .btn-bold {
+            background: #2c5f6e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-bold i {
+            font-size: 1rem;
+        }
+
+        .btn-bold.warning {
+            background: #d97706;
+        }
+
+        .btn-bold.danger {
+            background: #b91c1c;
+        }
+
+        .btn-bold.secondary {
+            background: #2c3e50;
+        }
+
+        .btn-bold:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        /* data-heavy tables */
+        .card-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            margin-bottom: 32px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #ffffff;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f3b44;
+        }
+
+        .badge {
+            background: #eef2ff;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1e4a6b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px 20px;
+            background: #f9fafb;
+            font-weight: 600;
+            color: #2c4f5e;
+            border-bottom: 1px solid #e4e9f0;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f2f6;
+            color: #1e2f3a;
+            font-weight: 500;
+        }
+
+        tr:hover td {
+            background-color: #fafcff;
+        }
+
+        .stock-low {
+            background-color: #fff1f0;
+            font-weight: 700;
+            color: #c2410c;
+        }
+
+        .stock-ok {
+            color: #2b6e3c;
+        }
+
+        .supplier-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .supplier-btn:hover {
+            background: #facc15;
+            border-color: #facc15;
+        }
+
+        .ph-number {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            color: #0f3b2c;
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 80px;
+                overflow-x: hidden;
+            }
+            .sidebar .logo-text, .sidebar .logo-sub, .nav-item span, .user-info span {
+                display: none;
+            }
+            .barcode-logo {
+                justify-content: center;
+            }
+            .nav-item {
+                justify-content: center;
+            }
+            .nav-item i {
+                margin: 0;
+            }
+            .main-content {
+                padding: 16px;
+            }
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e2a32;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 2000;
+            transition: 0.2s;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- UTILITY SIDEBAR: thick left sidebar for navigation -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="barcode-logo">
+                <img src="stocklogo.png" height="90%" width="80%">
+                <div>
+                    <div class="logo-sub">retail intelligence · PH</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" data-tab="inventory">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+            </div>
+            <div class="nav-item" data-tab="suppliers">
+                <i class="fas fa-truck"></i>
+                <span>Suppliers</span>
+            </div>
+            <div class="nav-item" data-tab="orders">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Orders</span>
+            </div>
+            <div class="nav-item" data-tab="reports">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item" data-tab="alerts">
+                <i class="fas fa-bell"></i>
+                <span>Alerts</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-store"></i>
+                <span>Retail Hub PH</span>
+            </div>
+            <div style="font-size: 0.7rem; color:#7f9aa8;">
+                <i class="fas fa-mobile-alt"></i> PH random contacts
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN: data-heavy center tables + action buttons -->
+    <div class="main-content" id="mainContent">
+        <div class="top-bar">
+            <div class="page-title">
+                <h1>Inventory Dashboard</h1>
+                <p>Scan / Input items • Set stock limits • Supplier alerts • PH numbers</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-bold" id="scanInputBtn"><i class="fas fa-barcode"></i> Scan/Input Item</button>
+                <button class="btn-bold warning" id="setLimitBtn"><i class="fas fa-exclamation-triangle"></i> Set Stock Limit</button>
+                <button class="btn-bold danger" id="alertSupplierBtn"><i class="fas fa-paper-plane"></i> Alert Supplier</button>
+                <button class="btn-bold secondary" id="generateReportBtn"><i class="fas fa-chart-simple"></i> Generate Report</button>
+            </div>
+        </div>
+
+        <!-- INVENTORY TABLE (heavy data) -->
+        <div class="card-panel" id="inventoryPanel">
+            <div class="card-header">
+                <h2><i class="fas fa-database"></i> Current Stock & Limits</h2>
+                <div class="badge"><i class="fas fa-sync-alt"></i> Live updates</div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="inventoryTable">
+                    <thead>
+                        <tr><th>Product ID</th><th>Item Name</th><th>Stock Qty</th><th>Stock Limit</th><th>Status</th><th>Supplier</th><th>Supplier Contact (PH)</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <!-- dynamic inventory rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Suppliers table with random PH numbers -->
+        <div class="card-panel" id="suppliersPanel" style="display: none;">
+            <div class="card-header">
+                <h2><i class="fas fa-handshake"></i> Key Suppliers (Philippines)</h2>
+                <div class="badge">Randomized mobile numbers</div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table id="suppliersTable">
+                    <thead><tr><th>Supplier ID</th><th>Name</th><th>Contact Person</th><th>PH Mobile Number</th><th>Lead Time</th><th>Products Supplied</th></tr></thead>
+                    <tbody id="suppliersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders table -->
+        <div class="card-panel" id="ordersPanel" style="display: none;">
+            <div class="card-header">
+                <h2><i class="fas fa-shopping-cart"></i> Pending & Recent Orders</h2>
+                <div class="badge">Auto replenish</div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Order #</th><th>Item</th><th>Qty</th><th>Order Date</th><th>Status</th><th>Supplier (PH)</th></tr></thead>
+                    <tbody>
+                        <tr><td>PO-2401</td><td>Organic Milk 1L</td><td>50 units</td><td>2026-04-01</td><td>Shipped</td><td>FreshGro Logistics</td></tr>
+                        <tr><td>PO-2402</td><td>LED Bulb 10W</td><td>120 pcs</td><td>2026-04-02</td><td>Processing</td><td>PrimeElectro</td></tr>
+                        <tr><td>PO-2403</td><td>Tomato Sauce</td><td>80 jars</td><td>2026-04-03</td><td>Pending</td><td>MetalPack Inc.</td></tr>
+                        <tr><td>PO-2404</td><td>Paper Towels</td><td>45 rolls</td><td>2026-04-04</td><td>Confirmed</td><td>Household Depot</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports panel -->
+        <div class="card-panel" id="reportsPanel" style="display: none;">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-pie"></i> Stock Reports & Insights</h2>
+                <div class="badge">Last 30 days</div>
+            </div>
+            <div style="padding: 20px;" id="reportDynamicContent">
+                <p><strong>📊 Low Stock Items:</strong> <span id="lowStockCountReport">--</span> products below reorder point.</p>
+                <p><strong>📈 Turnover Rate:</strong> +12% vs last month.</p>
+                <p><strong>⚠️ Top Alert:</strong> Reorder "AA Batteries" (current stock: 8, limit: 20).</p>
+                <p><strong>📞 PH Support Hotlines ready.</strong> Random contact numbers shown in inventory.</p>
+                <button class="btn-bold secondary" style="margin-top: 12px;" id="exportReportBtn"><i class="fas fa-download"></i> Export Full Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================= UTILITY: Generate random PH mobile numbers (Globe/Smart/Sun style) =======================
+    function randomPHMobile() {
+        const prefixes = ["0917", "0918", "0999", "0908", "0906", "0915", "0926", "0927", "0939", "0951", "0966", "0977"];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const suffix = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
+        return `+63 ${prefix} ${suffix.slice(0,3)} ${suffix.slice(3)}`;
+    }
+
+    // Supplier master list with base info (we will attach random numbers dynamically)
+    const supplierBase = [
+        { id: "SUP-101", name: "FreshGro Logistics", contactPerson: "Mario Dela Cruz", leadTime: "2 days", products: "Dairy, Vegetables" },
+        { id: "SUP-102", name: "MetalPack Inc.", contactPerson: "Jasmine Reyes", leadTime: "5 days", products: "Canned goods, Beverages" },
+        { id: "SUP-103", name: "PrimeElectro", contactPerson: "Kenneth Santos", leadTime: "7 days", products: "Electronics, Batteries" },
+        { id: "SUP-104", name: "Household Depot", contactPerson: "Maria Concepcion", leadTime: "3 days", products: "Cleaning, Paper goods" }
+    ];
+
+    // Assign random PH number to each supplier & keep mapping
+    let supplierContactMap = new Map();
+    supplierBase.forEach(sup => {
+        supplierContactMap.set(sup.name, randomPHMobile());
+    });
+
+    // Inventory items: each has supplier name, we also need to display the corresponding PH number
+    let inventoryItems = [
+        { id: "PR1001", name: "Organic Milk 1L", stock: 12, limit: 30, supplier: "FreshGro Logistics" },
+        { id: "PR1002", name: "Wheat Bread", stock: 5, limit: 20, supplier: "FreshGro Logistics" },
+        { id: "PR1003", name: "AA Batteries (4pk)", stock: 8, limit: 20, supplier: "PrimeElectro" },
+        { id: "PR1004", name: "LED Bulb 10W", stock: 42, limit: 40, supplier: "PrimeElectro" },
+        { id: "PR1005", name: "Tomato Sauce 400g", stock: 3, limit: 15, supplier: "MetalPack Inc." },
+        { id: "PR1006", name: "Dish Soap", stock: 22, limit: 25, supplier: "Household Depot" },
+        { id: "PR1007", name: "Canned Beans", stock: 6, limit: 18, supplier: "MetalPack Inc." },
+        { id: "PR1008", name: "Paper Towels", stock: 9, limit: 24, supplier: "Household Depot" }
+    ];
+
+    // Helper to get PH number for a supplier name
+    function getSupplierPhone(supplierName) {
+        return supplierContactMap.get(supplierName) || randomPHMobile();
+    }
+
+    // Render inventory table (with PH numbers column)
+    function renderInventoryTable() {
+        const tbody = document.getElementById('inventoryTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        inventoryItems.forEach((item) => {
+            const isLow = item.stock < item.limit;
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = item.id;
+            row.insertCell(1).innerText = item.name;
+            // stock qty
+            const stockCell = row.insertCell(2);
+            stockCell.innerText = item.stock;
+            if (isLow) stockCell.classList.add('stock-low');
+            row.insertCell(3).innerText = item.limit;
+            // status
+            const statusCell = row.insertCell(4);
+            if (isLow) {
+                statusCell.innerHTML = '<span style="background:#fee2e2; padding:4px 8px; border-radius:40px; color:#b91c1c; font-weight:600;">⚠️ Low stock</span>';
+            } else {
+                statusCell.innerHTML = '<span style="background:#e0f2e9; padding:4px 8px; border-radius:40px; color:#2b6e3c;">✓ Adequate</span>';
+            }
+            row.insertCell(5).innerText = item.supplier;
+            // PH number column
+            const phoneCell = row.insertCell(6);
+            const phNumber = getSupplierPhone(item.supplier);
+            phoneCell.innerHTML = `<span class="ph-number"><i class="fas fa-phone-alt"></i> ${phNumber}</span>`;
+            // action button
+            const actionCell = row.insertCell(7);
+            const alertBtn = document.createElement('button');
+            alertBtn.innerText = 'Alert Supplier';
+            alertBtn.className = 'supplier-btn';
+            alertBtn.setAttribute('data-item-id', item.id);
+            alertBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const contact = getSupplierPhone(item.supplier);
+                showToast(`📞 PH Alert sent to ${item.supplier} (${contact}) for "${item.name}" | Stock: ${item.stock}/${item.limit}`);
+            });
+            actionCell.appendChild(alertBtn);
+        });
+        // extra style for low stock rows
+        const rows = tbody.querySelectorAll('tr');
+        inventoryItems.forEach((item, idx) => {
+            if (item.stock < item.limit) rows[idx].classList.add('stock-low');
+        });
+    }
+
+    // Render Suppliers table (with random PH numbers, consistent per supplier)
+    function renderSuppliersTable() {
+        const tbody = document.getElementById('suppliersTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        supplierBase.forEach(sup => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = sup.id;
+            row.insertCell(1).innerText = sup.name;
+            row.insertCell(2).innerText = sup.contactPerson;
+            const phone = supplierContactMap.get(sup.name);
+            row.insertCell(3).innerHTML = `<span class="ph-number"><i class="fas fa-mobile-alt"></i> ${phone}</span>`;
+            row.insertCell(4).innerText = sup.leadTime;
+            row.insertCell(5).innerText = sup.products;
+        });
+    }
+
+    // Toast utility
+    let toastTimeout;
+    function showToast(message, duration = 3500) {
+        let existingToast = document.querySelector('.toast-msg');
+        if(existingToast) existingToast.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        if(toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => { toast.remove(); }, duration);
+    }
+
+    // SCAN/INPUT ITEM (with random PH supplier number)
+    function scanInputItem() {
+        const newId = "PR" + (Math.floor(Math.random() * 9000) + 1000);
+        const newName = prompt("Enter item name (e.g., 'Pandesal Pack')", "Pandesal Pack");
+        if(!newName) return;
+        const initialStock = parseInt(prompt("Current stock quantity (units)", "14") || "14");
+        const stockLimit = parseInt(prompt("Set stock limit (minimum threshold)", "25") || "25");
+        if(isNaN(initialStock) || isNaN(stockLimit)) return;
+        const suppliersList = ["FreshGro Logistics", "MetalPack Inc.", "PrimeElectro", "Household Depot"];
+        const randomSup = suppliersList[Math.floor(Math.random() * suppliersList.length)];
+        // ensure supplier exists in contact map
+        if(!supplierContactMap.has(randomSup)) {
+            supplierContactMap.set(randomSup, randomPHMobile());
+        }
+        inventoryItems.push({
+            id: newId,
+            name: newName,
+            stock: initialStock,
+            limit: stockLimit,
+            supplier: randomSup
+        });
+        renderInventoryTable();
+        showToast(`✅ Item "${newName}" scanned & added! Stock: ${initialStock}, Limit: ${stockLimit}. Supplier PH: ${getSupplierPhone(randomSup)}`);
+        switchTab('inventory');
+    }
+
+    // SET STOCK LIMIT
+    function setStockLimit() {
+        const productNames = inventoryItems.map((it, idx) => `${idx+1}. ${it.name} (current limit: ${it.limit})`).join('\n');
+        const choice = prompt(`✏️ Set new stock limit for item:\n${productNames}\n\nEnter item number or product ID:`, "1");
+        if(!choice) return;
+        let targetItem = null;
+        if(!isNaN(parseInt(choice))) {
+            const idx = parseInt(choice)-1;
+            if(idx>=0 && idx<inventoryItems.length) targetItem = inventoryItems[idx];
+        } else {
+            targetItem = inventoryItems.find(i => i.id.toUpperCase() === choice.toUpperCase());
+        }
+        if(!targetItem) { showToast("❌ Item not found"); return; }
+        const newLimit = parseInt(prompt(`New stock limit for ${targetItem.name} (current limit ${targetItem.limit}):`, targetItem.limit.toString()));
+        if(!isNaN(newLimit) && newLimit>=0) {
+            targetItem.limit = newLimit;
+            renderInventoryTable();
+            showToast(`📦 Stock limit for ${targetItem.name} updated to ${newLimit}`);
+        } else { showToast("Invalid limit value"); }
+    }
+
+    // ALERT SUPPLIER (global): notify all low-stock items with PH numbers
+    function alertSupplierGlobal() {
+        const lowItems = inventoryItems.filter(item => item.stock < item.limit);
+        if(lowItems.length === 0) {
+            showToast("✅ No low-stock items. All inventory levels are healthy.");
+            return;
+        }
+        let alertMessage = `🚨 LOW STOCK ALERT (Philippines)\n`;
+        lowItems.forEach(item => {
+            const phone = getSupplierPhone(item.supplier);
+            alertMessage += `→ ${item.name} (${item.stock}/${item.limit}) → Supplier: ${item.supplier} | Contact: ${phone}\n`;
+        });
+        showToast(`⚠️ Alert triggered! ${lowItems.length} supplier(s) notified via PH numbers.`, 4000);
+        alert(alertMessage + "\n\n(StockMaster demo: SMS/email simulation sent to each supplier's PH contact.)");
+    }
+
+    // GENERATE REPORT
+    function generateReport() {
+        switchTab('reports');
+        const lowStockCount = inventoryItems.filter(i => i.stock < i.limit).length;
+        const totalValueEst = inventoryItems.reduce((acc, i) => acc + (i.stock * 2.5), 0).toFixed(0);
+        const reportDiv = document.getElementById('reportDynamicContent');
+        if(reportDiv) {
+            reportDiv.innerHTML = `
+                <p><strong>📊 Stock Report (live - PH Retail):</strong> ${lowStockCount} items below threshold.</p>
+                <p><strong>📈 Reorder urgency:</strong> ${lowStockCount > 2 ? "High - review low stock" : "Moderate"}</p>
+                <p><strong>📅 Generated:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>📞 Sample PH Supplier Contact:</strong> ${supplierContactMap.get("PrimeElectro") || randomPHMobile()}</p>
+                <p><strong>💡 Next action:</strong> Use "Alert Supplier" to auto-notify via PH numbers.</p>
+                <button class="btn-bold secondary" style="margin-top:12px;" id="exportReportBtn"><i class="fas fa-download"></i> Export Full Report</button>
+            `;
+            const newExport = document.getElementById('exportReportBtn');
+            if(newExport) newExport.addEventListener('click', () => showToast("📄 Report exported (CSV simulation) - StockMaster PH ready."));
+        }
+        showToast(`Report generated. Low stock: ${lowStockCount} items. PH contact info included.`);
+    }
+
+    // Tab switching logic
+    function switchTab(tabId) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(nav => nav.getAttribute('data-tab') === tabId);
+        if(activeNav) activeNav.classList.add('active');
+        
+        const inventoryPanel = document.getElementById('inventoryPanel');
+        const suppliersPanel = document.getElementById('suppliersPanel');
+        const ordersPanel = document.getElementById('ordersPanel');
+        const reportsPanel = document.getElementById('reportsPanel');
+        
+        inventoryPanel.style.display = 'none';
+        suppliersPanel.style.display = 'none';
+        ordersPanel.style.display = 'none';
+        reportsPanel.style.display = 'none';
+        
+        if(tabId === 'inventory') inventoryPanel.style.display = 'block';
+        else if(tabId === 'suppliers') { suppliersPanel.style.display = 'block'; renderSuppliersTable(); }
+        else if(tabId === 'orders') ordersPanel.style.display = 'block';
+        else if(tabId === 'reports') reportsPanel.style.display = 'block';
+        else if(tabId === 'alerts') {
+            inventoryPanel.style.display = 'block';
+            showToast("🔔 Active alerts: items with stock below limit are highlighted + PH supplier numbers ready.");
+        }
+        const titleMap = { inventory: "Inventory • Stock & Limits (PH)", suppliers: "Supplier Directory • PH Contacts", orders: "Purchase Orders", reports: "Analytics & Reports", alerts: "Active Alerts" };
+        document.querySelector('.page-title h1').innerText = titleMap[tabId] || "StockMaster Dashboard";
+    }
+
+    // event binding
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.addEventListener('click', () => switchTab(nav.getAttribute('data-tab')));
+    });
+    document.getElementById('scanInputBtn').addEventListener('click', scanInputItem);
+    document.getElementById('setLimitBtn').addEventListener('click', setStockLimit);
+    document.getElementById('alertSupplierBtn').addEventListener('click', alertSupplierGlobal);
+    document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+    
+    // initial render
+    renderInventoryTable();
+    renderSuppliersTable();
+    switchTab('inventory');
+    
+    // extra export listener after dynamic creation
+    document.addEventListener('click', (e) => {
+        if(e.target && e.target.id === 'exportReportBtn') {
+            showToast("StockMaster PH report exported (CSV) - flat design + random PH numbers included.");
+        }
+    });
+</script>
+</body>
+</html>

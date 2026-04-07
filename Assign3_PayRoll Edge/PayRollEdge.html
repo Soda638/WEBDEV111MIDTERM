@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayRoll Edge · Philippine Payroll Solutions</title>
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #0a1a2f;  /* deep navy base */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+        }
+
+        /* main app container – bento grid background */
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* ----- header / top navigation (corporate solid) ----- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            background: #2d4b7c;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 16px -4px rgba(0,20,50,0.5);
+        }
+
+        .logo-text h1 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            color: #8bb0e0;
+            font-size: 0.8rem;
+            font-weight: 400;
+            display: block;
+        }
+
+        /* right side – corporate login / register with fingerprint & faceID */
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.05);
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #2d4b7c;
+        }
+
+        .security-badge i {
+            color: #7aa9ff;
+            font-size: 1.2rem;
+        }
+
+        .security-badge span {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 1px solid #3b5e9c;
+            color: white;
+            padding: 0.6rem 1.6rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login i {
+            color: #7aa9ff;
+        }
+
+        .btn-login:hover {
+            background: #1e3a5f;
+            border-color: #5a82c0;
+        }
+
+        .btn-register {
+            background: #2d4b7c;
+            border: none;
+            color: white;
+            padding: 0.6rem 1.6rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,60,130,0.4);
+        }
+
+        .btn-register i {
+            color: #b6d0ff;
+        }
+
+        .btn-register:hover {
+            background: #3e62a0;
+            transform: scale(1.02);
+        }
+
+        /* main heading with user flow */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+        }
+
+        .page-title i {
+            color: #6086cf;
+            margin-right: 12px;
+        }
+
+        .path-steps {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(18, 34, 58, 0.8);
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #2d4b7c;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            color: #a3c2f0;
+            font-size: 0.9rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step i {
+            color: #6086cf;
+            font-size: 0.8rem;
+        }
+
+        .step.active {
+            color: white;
+            font-weight: 500;
+        }
+
+        .arrow {
+            color: #2d4b7c;
+            font-size: 0.8rem;
+        }
+
+        /* ---------- BENTO GRID (main content) ---------- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            margin-top: 1.8rem;
+        }
+
+        /* base card style – white widgets with subtle navy shadows */
+        .widget {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem 1.3rem;
+            box-shadow: 0 20px 30px -10px rgba(0, 10, 30, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(2px);
+        }
+
+        .widget:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 36px -12px #030c1a;
+        }
+
+        /* widget header */
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+        }
+
+        .widget-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e2f4a;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .widget-header i {
+            color: #2d4b7c;
+            font-size: 1.3rem;
+            background: #eef3fc;
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        /* large numeric display */
+        .big-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #0a1a2f;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .widget-label {
+            color: #5e6f8d;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-indicator {
+            margin-top: 15px;
+            background: #e1e8f5;
+            height: 8px;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        .progress-fill {
+            width: 68%;
+            height: 8px;
+            background: #2d4b7c;
+            border-radius: 20px;
+        }
+
+        /* tax view pill */
+        .tax-badge {
+            background: #e0eaff;
+            color: #1e3a5f;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            margin-top: 12px;
+        }
+
+        /* payslip rows (staff related) */
+        .payslip-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5eefc;
+            padding: 10px 0;
+        }
+
+        .payslip-row:last-child {
+            border-bottom: none;
+        }
+
+        .payslip-name {
+            font-weight: 500;
+            color: #102a44;
+        }
+
+        .payslip-amount {
+            color: #1f3a64;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: #2d4b7c;
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 50px;
+        }
+
+        /* timesheet mini list */
+        .timesheet-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            color: #253c5c;
+        }
+
+        .day {
+            font-weight: 500;
+        }
+
+        .hours {
+            background: #e0eaff;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        .export-btn {
+            background: #f0f5ff;
+            border: 1px dashed #2d4b7c;
+            color: #1a3152;
+            padding: 12px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 12px;
+            transition: 0.2s;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .export-btn i {
+            color: #2d4b7c;
+        }
+
+        /* bento spans – make some widgets larger */
+        .widget-span-2 {
+            grid-column: span 2;
+        }
+
+        .widget-span-row-2 {
+            grid-row: span 2;
+        }
+
+        /* staff widget specific */
+        .staff-avatar {
+            width: 32px;
+            height: 32px;
+            background: #1e3a5f;
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .staff-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        /* responsive */
+        @media (max-width: 1000px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* fingerprint + faceID hints */
+        .security-footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #5470a0;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            border-top: 1px solid #1e3a5f;
+            padding-top: 1.8rem;
+        }
+
+        .security-footer i {
+            font-size: 1.2rem;
+            margin-right: 5px;
+            color: #8bb0e0;
+        }
+        
+        /* Philippine flag colors accent */
+        .ph-badge {
+            background: linear-gradient(135deg, #0038a8 0%, #ce1126 100%);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- corporate solid navy header with fingerprint & faceID icons (login/reg) -->
+        <div class="navbar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="logo-text">
+                    <img src=Payroll.png width=100% height=150>
+                    <span>corporate · secure · bento · ₱ Peso</span>
+                </div>
+            </div>
+
+            <div class="auth-section">
+                <div class="security-badge">
+                    <i class="fas fa-fingerprint"></i>
+                    <i class="fas fa-face-smile" style="font-size:1.3rem;"></i>  <!-- faceID proxy -->
+                    <span>2FA ready</span>
+                </div>
+                <div class="auth-buttons">
+                    <button class="btn-login"><i class="fas fa-lock"></i> Login</button>
+                    <button class="btn-register"><i class="fas fa-user-plus"></i> Register <i class="fas fa-face-viewfinder" style="margin-left:4px;"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- user flow (the path) -->
+        <div class="flow-row">
+            <div class="page-title">
+                <i class="fas fa-diagram-project"></i> Payroll dashboard · <span style="color: #FFD700;">Philippine Peso (₱)</span>
+            </div>
+            <div class="path-steps">
+                <span class="step active"><i class="fas fa-clock"></i> Log hours</span>
+                <i class="fas fa-chevron-right arrow"></i>
+                <span class="step"><i class="fas fa-percent"></i> Calculate tax</span>
+                <i class="fas fa-chevron-right arrow"></i>
+                <span class="step"><i class="fas fa-receipt"></i> View payslip</span>
+                <i class="fas fa-chevron-right arrow"></i>
+                <span class="step"><i class="fas fa-file-export"></i> Export data</span>
+            </div>
+        </div>
+
+        <!-- MAIN BENTO GRID – widgets: Next Payday, Total Hours, Tax, Staff, Timesheets, Payslips -->
+        <div class="bento-grid">
+            
+            <!-- Widget 1: Next Payday (big) -->
+            <div class="widget widget-span-2">
+                <div class="widget-header">
+                    <h3><i class="far fa-calendar-alt" style="margin-right:6px;"></i> Next payday</h3>
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="big-number">March 31, 2026</div>
+                <div class="widget-label">
+                    <i class="fas fa-hourglass-half"></i> in 14 days · monthly closing
+                </div>
+                <div class="progress-indicator">
+                    <div class="progress-fill" style="width: 45%;"></div>
+                </div>
+                <div style="margin-top: 18px; display: flex; gap: 8px;">
+                    <span class="tax-badge"><i class="fas fa-cloud-sun"></i> Q2 advance</span>
+                    <span class="tax-badge" style="background: #0038a8; color: white;"><i class="fas fa-coins"></i> ₱ Peso</span>
+                </div>
+            </div>
+
+            <!-- Widget 2: Total Hours (this week) + timesheet preview -->
+            <div class="widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-clock"></i> Total hours</h3>
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <div class="big-number">38.5</div>
+                <div class="widget-label"><i class="fas fa-calendar-week"></i> this week (Mar 10–16)</div>
+                <div class="timesheet-item">
+                    <span class="day">Mon</span>
+                    <span class="hours">8.0h</span>
+                </div>
+                <div class="timesheet-item">
+                    <span class="day">Tue</span>
+                    <span class="hours">8.5h</span>
+                </div>
+                <div class="timesheet-item">
+                    <span class="day">Wed</span>
+                    <span class="hours">8.0h</span>
+                </div>
+                <div class="timesheet-item">
+                    <span class="day">Thu</span>
+                    <span class="hours">7.5h</span>
+                </div>
+                <div style="margin-top: 6px;"><i class="fas fa-plus-circle" style="color:#2d4b7c;"></i> 3 more days</div>
+            </div>
+
+            <!-- Widget 3: Tax view (summary) - CHANGED TO PESO -->
+            <div class="widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-percent"></i> Tax (YTD)</h3>
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="big-number">₱248,280</div>
+                <div class="widget-label"><i class="fas fa-arrow-up"></i> 8.2% vs last month</div>
+                <div class="tax-badge" style="margin-top: 16px;">
+                    <i class="fas fa-check-circle"></i> Tax view: marginal rate 24%
+                </div>
+                <div style="margin-top: 14px; background:#f2f7ff; border-radius: 20px; padding:10px;">
+                    <span style="display:flex; justify-content: space-between;">
+                        <span>Federal (BIR)</span> <strong>₱174,940</strong>
+                    </span>
+                    <span style="display:flex; justify-content: space-between;">
+                        <span>State (Local)</span> <strong>₱73,340</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Widget 4: Staff (from corporate menu) - Filipino names -->
+            <div class="widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-users"></i> Staff on duty</h3>
+                    <i class="fas fa-id-badge"></i>
+                </div>
+                <div class="staff-line">
+                    <div class="staff-avatar">JS</div>
+                    <span style="flex:1;">Juan Santos</span>
+                    <span class="badge-new">FT</span>
+                </div>
+                <div class="staff-line">
+                    <div class="staff-avatar">MR</div>
+                    <span style="flex:1;">Maria Reyes</span>
+                    <span class="badge-new">PT</span>
+                </div>
+                <div class="staff-line">
+                    <div class="staff-avatar">AG</div>
+                    <span style="flex:1;">Andres Garcia</span>
+                    <span class="badge-new">contract</span>
+                </div>
+                <div style="margin-top:10px; color:#1e3a5f;"><i class="fas-regular fa-plus"></i> 4 more</div>
+            </div>
+
+            <!-- Widget 5: Payslips (recent) – view payslip step preview - CHANGED TO PESO -->
+            <div class="widget widget-span-2">
+                <div class="widget-header">
+                    <h3><i class="fas fa-receipt"></i> Recent payslips</h3>
+                    <i class="fas fa-download"></i>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Feb 28, 2026</span>
+                            <span class="payslip-amount">₱42,240</span>
+                        </div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Jan 31, 2026</span>
+                            <span class="payslip-amount">₱41,105</span>
+                        </div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Dec 30, 2025</span>
+                            <span class="payslip-amount">₱43,400</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Nov 30</span>
+                            <span class="payslip-amount">₱41,110</span>
+                        </div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Oct 31</span>
+                            <span class="payslip-amount">₱40,980</span>
+                        </div>
+                        <div class="payslip-row">
+                            <span class="payslip-name">Sep 30</span>
+                            <span class="payslip-amount">₱41,020</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; text-align: right;">
+                    <i class="fas fa-file-pdf" style="color:#2d4b7c; margin-right:12px;"></i>
+                    <i class="fas fa-file-csv" style="color:#2d4b7c;"></i>  export options
+                </div>
+            </div>
+
+            <!-- Widget 6: Export Data (dedicated) -->
+            <div class="widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-file-export"></i> Export data</h3>
+                    <i class="fas fa-box-archive"></i>
+                </div>
+                <div class="export-btn">
+                    <i class="fas fa-download"></i>  Export as CSV
+                </div>
+                <div class="export-btn" style="background: #e9effa; margin-top: 6px;">
+                    <i class="fas fa-file-pdf"></i>  PDF summary
+                </div>
+                <div class="export-btn" style="background: #dbe6f5; border: none;">
+                    <i class="fas fa-cloud-arrow-up"></i>  SFTP push
+                </div>
+                <div style="margin-top: 15px;">
+                    <i class="fas fa-fingerprint" style="color:#1e3a5f; margin-right:5px;"></i>
+                    <span style="color:#2d4b7c; font-size:0.85rem;">last export: today 09:34</span>
+                </div>
+            </div>
+
+            <!-- Widget 7: Timesheets quick entry (Log hours) -->
+            <div class="widget">
+                <div class="widget-header">
+                    <h3><i class="fas fa-pen"></i> Log work hours</h3>
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <div style="display: flex; gap: 6px; background:#eef3fc; border-radius: 40px; padding: 10px;">
+                    <i class="fas fa-keyboard" style="color:#1e3a5f;"></i>
+                    <span style="color:#102a44;">quick entry · Mar 17</span>
+                </div>
+                <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="tax-badge" style="background: #dbe2f0;">+8h</span>
+                    <span class="tax-badge" style="background: #dbe2f0;">+7.5h</span>
+                    <span class="tax-badge" style="background: #2d4b7c; color:white;">submit</span>
+                </div>
+            </div>
+
+            <!-- Widget 8: extra bento – calculate tax shortcut - CHANGED TO PESO -->
+            <div class="widget widget-span-2">
+                <div class="widget-header">
+                    <h3><i class="fas fa-calculator"></i> Calculate tax (preview)</h3>
+                    <i class="fas fa-chart-simple"></i>
+                </div>
+                <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <span style="color:#4f6f9f;">Gross pay YTD</span>
+                        <div class="big-number" style="font-size:2rem;">₱1,042,800</div>
+                    </div>
+                    <div>
+                        <span style="color:#4f6f9f;">Est. tax</span>
+                        <div class="big-number" style="font-size:2rem;">₱297,210</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-arrow-right" style="color:#2d4b7c; font-size:2rem;"></i>
+                    </div>
+                </div>
+                <div class="progress-indicator" style="margin-top:6px;">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+                <div class="tax-badge"><i class="fas fa-face-viewfinder"></i> detailed breakdown available</div>
+            </div>
+        </div>
+
+        <!-- security footer with fingerprint / faceID emphasis (corporate solid) -->
+        <div class="security-footer">
+            <span><i class="fas fa-fingerprint"></i> biometric authentication</span>
+            <span><i class="fas fa-face-viewfinder"></i> face ID ready</span>
+            <span><i class="fas fa-shield-halved"></i> 2FA · SSO</span>
+            <span><i class="fas fa-coins" style="color: #FFD700;"></i> Philippine Peso (₱)</span>
+        </div>
+
+        <!-- tiny note: the bento grid includes: next payday, total hours, tax, staff, payslips, export, log hours, calc tax -->
+    </div>
+</body>
+</html>
