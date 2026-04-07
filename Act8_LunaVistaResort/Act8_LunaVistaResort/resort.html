@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luna Vista · tropical sunrise</title>
+  <style>
+    /* RESET & FONTS */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background-color: #2F6B5E; /* Deep Lagoon – rich, grounding */
+    }
+
+    /* ===== FULL-SCREEN HERO WITH VIDEO ===== */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;            /* full viewport height */
+      overflow: hidden;
+    }
+
+    /* background video – high‑def, covers everything */
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: brightness(0.9) saturate(1.05);  /* gentle warm touch */
+    }
+
+    /* semi‑transparent overlay – tropical sunrise palette */
+    .overlay {
+      position: relative;
+      z-index: 2;
+      max-width: 560px;
+      width: 92%;
+      margin: 0 auto;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 248, 240, 0.15);    /* Shell White transparent */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 48px;
+      padding: 2.2rem 2rem 2.5rem 2rem;
+      box-shadow: 0 25px 40px rgba(47, 107, 94, 0.6); /* Deep Lagoon shadow */
+      border: 1px solid rgba(255, 160, 122, 0.5); /* Coral Sand edge */
+      color: #2F6B5E; /* Deep Lagoon for text */
+    }
+
+    /* resort name – tropical sunrise */
+    .resort-name {
+      font-size: 2.2rem;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #FFA07A;           /* Coral Sand – warm accent */
+      text-shadow: 0 2px 6px #2F6B5E;
+    }
+
+    .resort-name span {
+      font-size: 2.4rem;
+    }
+
+    /* ----- LOGIN ROW (tropical palette) ----- */
+    .login-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(168, 230, 207, 0.25);    /* Seafoam transparent */
+      border-radius: 60px;
+      padding: 8px 12px;
+      margin-bottom: 2.2rem;
+      border: 1px solid rgba(255, 160, 122, 0.6); /* Coral Sand */
+    }
+
+    .login-row input {
+      background: rgba(47, 107, 94, 0.5);        /* Deep Lagoon translucent */
+      border: none;
+      padding: 12px 16px;
+      color: #FFF8F0;            /* Shell White text */
+      font-size: 0.95rem;
+      flex: 1 1 130px;
+      min-width: 130px;
+      outline: none;
+      border-radius: 40px;
+    }
+
+    .login-row input::placeholder {
+      color: #D2B48C;            /* Wet Sand */
+      opacity: 0.9;
+    }
+
+    .login-row button {
+      background: #FFA07A;        /* Coral Sand */
+      border: none;
+      color: #2F6B5E;             /* Deep Lagoon */
+      padding: 8px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+      border: 1px solid #A8E6CF;   /* Seafoam */
+    }
+
+    .login-row button:hover {
+      background: #A8E6CF;        /* Seafoam */
+      color: #2F6B5E;
+      transform: scale(1.02);
+    }
+
+    .login-row .signup {
+      background: #D2B48C;        /* Wet Sand */
+      color: #2F6B5E;
+    }
+
+    .login-row .signup:hover {
+      background: #FFF8F0;        /* Shell White */
+      border-color: #FFA07A;
+    }
+
+    /* ----- BOOKING STEPS (tropical palette) ----- */
+    .booking-step {
+      margin-bottom: 1.2rem;
+      background: rgba(168, 230, 207, 0.2);     /* Seafoam transparent */
+      border-radius: 60px;
+      padding: 0.7rem 1.2rem 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 160, 122, 0.5); /* Coral Sand */
+    }
+
+    .step-icon {
+      font-size: 1.9rem;
+      width: 48px;
+      text-align: center;
+      filter: drop-shadow(0 2px 2px #2F6B5E);
+    }
+
+    .step-content {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #FFA07A;            /* Coral Sand */
+      min-width: 85px;
+      letter-spacing: 0.5px;
+    }
+
+    /* inputs & selects – tropical palette */
+    .step-content input,
+    .step-content select {
+      background: rgba(47, 107, 94, 0.7);        /* Deep Lagoon */
+      border: 1px solid #A8E6CF;                  /* Seafoam */
+      border-radius: 40px;
+      padding: 8px 18px;
+      color: #FFF8F0;            /* Shell White text */
+      font-size: 0.9rem;
+      flex: 1 1 150px;
+      min-width: 140px;
+      outline: none;
+    }
+
+    .step-content input:focus,
+    .step-content select:focus {
+      border-color: #FFA07A;      /* Coral Sand */
+      background: rgba(47, 107, 94, 0.85);
+    }
+
+    .step-content select option {
+      background: #2F6B5E;
+      color: #A8E6CF;             /* Seafoam */
+    }
+
+    .small-btn {
+      background: #D2B48C;        /* Wet Sand */
+      border: none;
+      border-radius: 40px;
+      padding: 8px 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #2F6B5E;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+      border: 1px solid #FFA07A;   /* Coral Sand */
+    }
+
+    .small-btn:hover {
+      background: #FFA07A;         /* Coral Sand */
+      color: #2F6B5E;
+    }
+
+    /* final check‑in button – tropical sunrise */
+    .checkin-block {
+      text-align: right;
+      margin-top: 2rem;
+    }
+
+    .checkin-btn {
+      background: #FFA07A;         /* Coral Sand */
+      color: #2F6B5E;              /* Deep Lagoon */
+      border: none;
+      border-radius: 60px;
+      padding: 14px 38px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(47, 107, 94, 0.6);
+      transition: 0.2s;
+      border: 2px solid #A8E6CF;    /* Seafoam */
+    }
+
+    .checkin-btn:hover {
+      background: #A8E6CF;          /* Seafoam */
+      transform: translateY(-3px);
+      border-color: #D2B48C;        /* Wet Sand */
+    }
+
+    /* itinerary preview – tropical palette */
+    .itinerary {
+      margin-top: 1.8rem;
+      font-size: 0.95rem;
+      border-top: 2px dashed #D2B48C;        /* Wet Sand */
+      padding-top: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: #FFF8F0;               /* Shell White */
+    }
+
+    .itinerary span {
+      background: rgba(47, 107, 94, 0.7);      /* Deep Lagoon transparent */
+      padding: 6px 18px;
+      border-radius: 40px;
+      border: 1px solid #FFA07A;    /* Coral Sand */
+    }
+
+    /* bottom nav – tropical */
+    .bottom-nav {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(210, 180, 140, 0.2);    /* Wet Sand transparent */
+      backdrop-filter: blur(8px);
+      border-radius: 60px;
+      padding: 10px 28px;
+      display: flex;
+      gap: 32px;
+      z-index: 20;
+      border: 1px solid #FFA07A;    /* Coral Sand */
+    }
+
+    .bottom-nav a {
+      color: #FFF8F0;                /* Shell White */
+      text-decoration: none;
+      font-weight: 500;
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+    }
+
+    .bottom-nav a.active {
+      border-bottom-color: #FFA07A;   /* Coral Sand active */
+      color: #A8E6CF;                 /* Seafoam */
+    }
+
+    /* responsive */
+    @media (max-width: 550px) {
+      .overlay {
+        padding: 1.5rem;
+      }
+      .booking-step {
+        flex-wrap: wrap;
+        border-radius: 40px;
+      }
+      .step-icon {
+        width: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- full-screen hero with video -->
+<section class="hero">
+  <!-- high‑def video (same peaceful resort clip) -->
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="resort_video.mp4" type="video/mp4">
+  </video>
+
+  <!-- overlay with TROPICAL SUNRISE palette -->
+  <div class="overlay">
+    <div class="resort-name">
+      <img src=resort_logo.png width=90%>
+    </div>
+
+    <!-- login row (tropical colors) -->
+    <div class="login-row">
+      <input type="email" placeholder="Email" value="guest@example.com">
+      <input type="password" placeholder="Password" value="123456">
+      <button>Login</button>
+      <button class="signup">Sign up</button>
+    </div>
+
+    <!-- step 1: Input dates -->
+    <div class="booking-step">
+      <div class="step-icon">📅</div>
+      <div class="step-content">
+        <span class="step-label">1. DATES</span>
+        <input type="date" value="2026-07-15">
+        <span style="color:#FFA07A;">→</span>
+        <input type="date" value="2026-07-20">
+      </div>
+    </div>
+
+    <!-- step 2: Filter room type -->
+    <div class="booking-step">
+      <div class="step-icon">🏨</div>
+      <div class="step-content">
+        <span class="step-label">2. ROOM</span>
+        <select>
+          <option>Ocean front suite</option>
+          <option>Garden view room</option>
+          <option>Deluxe double</option>
+          <option>Family bungalow</option>
+        </select>
+        <button class="small-btn">filter</button>
+      </div>
+    </div>
+
+    <!-- step 3: Add amenities -->
+    <div class="booking-step">
+      <div class="step-icon">🍹</div>
+      <div class="step-content">
+        <span class="step-label">3. AMENITIES</span>
+        <select>
+          <option>Breakfast (+$25)</option>
+          <option>Pool access</option>
+          <option>Spa package</option>
+          <option>Airport pickup</option>
+        </select>
+        <button class="small-btn">add</button>
+      </div>
+    </div>
+
+    <!-- step 4: big check‑in button -->
+    <div class="checkin-block">
+      <button class="checkin-btn">✅ CHECK IN ONLINE</button>
+    </div>
+
+    <!-- itinerary preview – tropical sunrise style -->
+    <div class="itinerary">
+      <span>📋 Itinerary: 5 nights · ocean view</span>
+      <span>🌞 flexible</span>
+    </div>
+  </div>
+</section>
+
+<!-- bottom navigation (tropical palette) -->
+<nav class="bottom-nav">
+  <a href="#" class="active">Home</a>
+  <a href="#">About</a>
+  <a href="#">Contact</a>
+</nav>
+
+<!-- interactive demo alerts (same behaviour) -->
+<script>
+  document.querySelectorAll('.login-row button, .small-btn, .checkin-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (btn.classList.contains('checkin-btn')) {
+        alert('✨ Welcome to Luna Vista under the tropical sunrise! (demo)');
+      } else if (btn.classList.contains('signup')) {
+        alert('🔐 Sign up – start your getaway!');
+      } else if (btn.innerText === 'Login') {
+        alert('👋 Login demo (sunrise mode)');
+      } else {
+        alert(`🛎️  ${btn.innerText} – tropical demo`);
+      }
+    });
+  });
+
+  // bottom nav active toggle
+  document.querySelectorAll('.bottom-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.bottom-nav a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      if (link.innerText === 'About') alert('🌴 Sunrise paradise – Luna Vista');
+      if (link.innerText === 'Contact') alert('📞 +1 800 555 SUNRISE (demo)');
+    });
+  });
+</script>
+
+<!-- Tropical Sunrise palette used: #FFA07A (Coral Sand), #A8E6CF (Seafoam), #2F6B5E (Deep Lagoon), #FFF8F0 (Shell White), #D2B48C (Wet Sand) -->
+</body>
+</html>

@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>HealthSync Clinic | Smart Appointment Wizard</title>
+    <!-- Google Fonts + simple reset for clean sans-serif medical style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free icons for verified badge, steps) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F1F5F9;   /* subtle cool neutral, but main surfaces remain white */
+            font-family: 'Inter', sans-serif;
+            color: #0B2B3F;
+            line-height: 1.4;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* main card – clean white background, trust-blue accents */
+        .app-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 86, 102, 0.12), 0 1px 2px rgba(0,0,0,0.02);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* header area: HealthSync + verified badge on reg button */
+        .header {
+            padding: 1.5rem 2rem 0.75rem 2rem;
+            border-bottom: 1px solid #E9EEF2;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .logo-area h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #0056A1 0%, #0077BE 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #5C6F87;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* REG button with verified badge */
+        .reg-btn {
+            background-color: white;
+            border: 1.5px solid #CFE3F0;
+            border-radius: 60px;
+            padding: 0.6rem 1.3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0056A1;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: default;
+            transition: background 0.2s;
+            background: #F9FCFE;
+        }
+        .reg-btn i {
+            font-size: 1rem;
+            color: #2B7A3E;
+        }
+        .verified-badge {
+            background: #E9F6EC;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #1F6E3C;
+            letter-spacing: -0.2px;
+        }
+        .verified-badge i {
+            font-size: 0.7rem;
+            color: #1F6E3C;
+        }
+        .reg-btn .btn-text {
+            font-weight: 600;
+        }
+
+        /* Wizard step indicator — one step per screen */
+        .wizard-steps {
+            padding: 1rem 2rem 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: white;
+        }
+        .step-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #94A3B8;
+            transition: all 0.2s;
+        }
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #F0F4F9;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #4A627A;
+        }
+        .step-item.active .step-number {
+            background: #0056A1;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,86,161,0.2);
+        }
+        .step-item.active .step-label {
+            color: #0F2B3F;
+            font-weight: 600;
+        }
+        .step-item.completed .step-number {
+            background: #2B7A3E;
+            color: white;
+        }
+        .step-item.completed .step-label {
+            color: #2B7A3E;
+        }
+        .step-label {
+            display: none;
+        }
+        @media (min-width: 500px) {
+            .step-label {
+                display: inline-block;
+            }
+        }
+
+        /* main wizard screen: one question per screen */
+        .wizard-screen {
+            padding: 2rem 2rem 1.8rem 2rem;
+            background: white;
+        }
+        .question-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #0B2B3F;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.3px;
+        }
+        .question-sub {
+            font-size: 0.9rem;
+            color: #5B6F8C;
+            margin-bottom: 2rem;
+            border-left: 3px solid #CFE3F0;
+            padding-left: 12px;
+        }
+
+        /* form controls */
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .specialty-card, .doctor-card, .time-slot {
+            background: #FBFDFF;
+            border: 1.5px solid #E2EDF5;
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .specialty-card i, .doctor-card i, .time-slot i {
+            font-size: 1.3rem;
+            color: #0070B8;
+            width: 28px;
+        }
+        .specialty-card.selected, .doctor-card.selected, .time-slot.selected {
+            border-color: #0056A1;
+            background: #F0F9FF;
+            box-shadow: 0 4px 12px rgba(0,86,161,0.08);
+        }
+        .card-info h4 {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .card-info p {
+            font-size: 0.8rem;
+            color: #62748C;
+        }
+        /* time grid layout */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+        }
+        .time-slot {
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            padding: 0.8rem 0.5rem;
+        }
+        .time-slot i {
+            margin-bottom: 6px;
+        }
+
+        /* confirmation summary */
+        .confirmation-card {
+            background: #F0F9FF;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #DBEAF5;
+        }
+        .confirmation-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 1rem;
+        }
+        .confirmation-label {
+            font-weight: 500;
+            color: #2C4C6E;
+        }
+        .confirmation-value {
+            font-weight: 700;
+            color: #0A2F44;
+        }
+
+        /* navigation buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            gap: 1rem;
+        }
+        .btn {
+            padding: 0.9rem 1.8rem;
+            border-radius: 48px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary {
+            background: #0056A1;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,86,161,0.2);
+        }
+        .btn-primary:hover {
+            background: #004080;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #2C4C6E;
+            border: 1px solid #DAE5ED;
+        }
+        .btn-secondary:hover {
+            background: #E6EDF4;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .success-message {
+            text-align: center;
+            padding: 1rem 0;
+            background: #E9F6EC;
+            border-radius: 28px;
+            margin-top: 0.8rem;
+            color: #1C6E3F;
+        }
+        hr {
+            margin: 0.5rem 0;
+            border-color: #EFF3F8;
+        }
+        footer {
+            padding: 0.9rem 2rem 1.5rem 2rem;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #8CA0B5;
+            border-top: 1px solid #ECF3F8;
+            background: white;
+        }
+        @media (max-width: 500px) {
+            .question-title { font-size: 1.4rem; }
+            .wizard-screen { padding: 1.5rem; }
+            .header { padding: 1rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- Header: HealthSync + Trust-Blue verified badge on Reg button -->
+    <div class="header">
+        <div class="logo-area">
+            <img src="healthlogo.png" height="30%" width="40%">
+            <p>Smart care, seamless booking</p>
+        </div>
+        <div class="reg-btn">
+            <span class="btn-text">Register</span>
+            <span class="verified-badge">
+                <i class="fas fa-check-circle"></i> Verified
+            </span>
+        </div>
+    </div>
+
+    <!-- Step-by-step wizard indicators (one question per screen) -->
+    <div class="wizard-steps" id="stepIndicator">
+        <div class="step-item" data-step="0">
+            <div class="step-number">1</div>
+            <span class="step-label">Specialty</span>
+        </div>
+        <div class="step-item" data-step="1">
+            <div class="step-number">2</div>
+            <span class="step-label">Doctor</span>
+        </div>
+        <div class="step-item" data-step="2">
+            <div class="step-number">3</div>
+            <span class="step-label">Time</span>
+        </div>
+        <div class="step-item" data-step="3">
+            <div class="step-number">4</div>
+            <span class="step-label">Confirm</span>
+        </div>
+    </div>
+
+    <!-- Dynamic wizard content: one question at a time -->
+    <div id="wizardContent" class="wizard-screen"></div>
+    <footer>
+        <i class="fas fa-shield-alt"></i> Trust-Blue security · HIPAA-ready · Verified clinic
+    </footer>
+</div>
+
+<script>
+    // ---------- Data Models ----------
+    const specialties = [
+        { id: "cardio", name: "Cardiology", icon: "fas fa-heartbeat", desc: "Heart & vascular health" },
+        { id: "derma", name: "Dermatology", icon: "fas fa-allergies", desc: "Skin, hair & nails" },
+        { id: "neuro", name: "Neurology", icon: "fas fa-brain", desc: "Brain & nervous system" },
+        { id: "pedia", name: "Pediatrics", icon: "fas fa-child", desc: "Children's wellness" }
+    ];
+
+    // doctors mapped per specialty
+    const doctorsDB = {
+        cardio: [
+            { id: "doc1", name: "Dr. Emily Chen", title: "Interventional Cardiologist", rating: "4.9" },
+            { id: "doc2", name: "Dr. Michael Rivers", title: "Preventive Cardiology", rating: "4.8" }
+        ],
+        derma: [
+            { id: "doc3", name: "Dr. Sophia Lee", title: "Clinical Dermatologist", rating: "4.9" },
+            { id: "doc4", name: "Dr. James Park", title: "Cosmetic Dermatology", rating: "4.7" }
+        ],
+        neuro: [
+            { id: "doc5", name: "Dr. Olivia Brooks", title: "Neurologist", rating: "4.9" },
+            { id: "doc6", name: "Dr. Ethan Clarke", title: "Headache Specialist", rating: "4.8" }
+        ],
+        pedia: [
+            { id: "doc7", name: "Dr. Linda Hayes", title: "General Pediatrics", rating: "4.9" },
+            { id: "doc8", name: "Dr. Robert Ngyuen", title: "Adolescent Medicine", rating: "4.8" }
+        ]
+    };
+
+    // available time slots (generic)
+    const timeSlots = [
+        "09:00 AM", "10:15 AM", "11:30 AM", "01:00 PM", "02:15 PM", "03:45 PM"
+    ];
+
+    // Wizard state
+    let currentStep = 0;          // 0: specialty, 1: doctor, 2: time, 3: confirmation
+    let selectedSpecialty = null;
+    let selectedDoctor = null;
+    let selectedTime = null;
+
+    // Helper: render based on step
+    function renderWizard() {
+        updateStepIndicator();
+        const container = document.getElementById("wizardContent");
+        if (!container) return;
+
+        if (currentStep === 0) {
+            container.innerHTML = renderSpecialtyScreen();
+            attachSpecialtyEvents();
+        } else if (currentStep === 1) {
+            if (!selectedSpecialty) {
+                // fallback: if somehow no specialty, go back to step0
+                currentStep = 0;
+                renderWizard();
+                return;
+            }
+            container.innerHTML = renderDoctorScreen();
+            attachDoctorEvents();
+        } else if (currentStep === 2) {
+            if (!selectedDoctor) {
+                currentStep = 1;
+                renderWizard();
+                return;
+            }
+            container.innerHTML = renderTimeScreen();
+            attachTimeEvents();
+        } else if (currentStep === 3) {
+            if (!selectedTime) {
+                currentStep = 2;
+                renderWizard();
+                return;
+            }
+            container.innerHTML = renderConfirmationScreen();
+            attachConfirmEvents();
+        }
+    }
+
+    function renderSpecialtyScreen() {
+        return `
+            <div class="question-title">Select your specialty</div>
+            <div class="question-sub">Choose the medical area that matches your needs</div>
+            <div class="options-group" id="specialtyList">
+                ${specialties.map(spec => `
+                    <div class="specialty-card" data-specialty-id="${spec.id}">
+                        <i class="${spec.icon}"></i>
+                        <div class="card-info">
+                            <h4>${spec.name}</h4>
+                            <p>${spec.desc}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn" disabled>Back</button>
+                <button class="btn btn-primary" id="nextBtn0" disabled>Next →</button>
+            </div>
+        `;
+    }
+
+    function renderDoctorScreen() {
+        const doctorsList = doctorsDB[selectedSpecialty.id] || [];
+        return `
+            <div class="question-title">Pick a specialist</div>
+            <div class="question-sub">${selectedSpecialty.name} · Verified providers</div>
+            <div class="options-group" id="doctorList">
+                ${doctorsList.map(doc => `
+                    <div class="doctor-card" data-doctor-id="${doc.id}">
+                        <i class="fas fa-user-md"></i>
+                        <div class="card-info">
+                            <h4>${doc.name}</h4>
+                            <p>${doc.title}  <i class="fas fa-star" style="color:#F5B042; font-size:0.7rem;"></i> ${doc.rating}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn1">← Back</button>
+                <button class="btn btn-primary" id="nextBtn1" disabled>Next →</button>
+            </div>
+        `;
+    }
+
+    function renderTimeScreen() {
+        return `
+            <div class="question-title">Choose your time</div>
+            <div class="question-sub">Available slots for Dr. ${selectedDoctor?.name?.split(' ').slice(0,2).join(' ') || 'specialist'}</div>
+            <div class="time-grid" id="timeGrid">
+                ${timeSlots.map(time => `
+                    <div class="time-slot" data-time="${time}">
+                        <i class="far fa-calendar-check"></i>
+                        <strong>${time}</strong>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn2">← Back</button>
+                <button class="btn btn-primary" id="nextBtn2" disabled>Review →</button>
+            </div>
+        `;
+    }
+
+    function renderConfirmationScreen() {
+        const specialtyName = selectedSpecialty?.name || "—";
+        const doctorName = selectedDoctor?.name || "—";
+        const timeValue = selectedTime || "—";
+        return `
+            <div class="question-title">Confirm appointment</div>
+            <div class="question-sub">Double-check your details before booking</div>
+            <div class="confirmation-card">
+                <div class="confirmation-item">
+                    <span class="confirmation-label"><i class="fas fa-stethoscope"></i> Specialty</span>
+                    <span class="confirmation-value">${specialtyName}</span>
+                </div>
+                <div class="confirmation-item">
+                    <span class="confirmation-label"><i class="fas fa-user-md"></i> Physician</span>
+                    <span class="confirmation-value">${doctorName}</span>
+                </div>
+                <div class="confirmation-item">
+                    <span class="confirmation-label"><i class="far fa-clock"></i> Date & Time</span>
+                    <span class="confirmation-value">Today, ${timeValue}</span>
+                </div>
+                <hr>
+                <div class="confirmation-item">
+                    <span class="confirmation-label"><i class="fas fa-check-circle" style="color:#2B7A3E;"></i> Verified slot</span>
+                    <span class="confirmation-value">Guaranteed</span>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn3">← Back</button>
+                <button class="btn btn-primary" id="confirmBtn">Confirm Appointment ✓</button>
+            </div>
+            <div id="successMessage" style="margin-top: 1rem;"></div>
+        `;
+    }
+
+    // Event binding per screen
+    function attachSpecialtyEvents() {
+        const cards = document.querySelectorAll('.specialty-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                cards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                const specId = card.getAttribute('data-specialty-id');
+                selectedSpecialty = specialties.find(s => s.id === specId);
+                const nextBtn = document.getElementById('nextBtn0');
+                if (nextBtn) nextBtn.disabled = false;
+            });
+        });
+        const nextBtn = document.getElementById('nextBtn0');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (selectedSpecialty) {
+                    currentStep = 1;
+                    renderWizard();
+                }
+            });
+        }
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) backBtn.disabled = true;
+    }
+
+    function attachDoctorEvents() {
+        const doctorCards = document.querySelectorAll('.doctor-card');
+        const nextBtn = document.getElementById('nextBtn1');
+        const backBtn = document.getElementById('backBtn1');
+
+        function enableNext() {
+            if (nextBtn) nextBtn.disabled = !selectedDoctor;
+        }
+
+        doctorCards.forEach(card => {
+            card.addEventListener('click', () => {
+                doctorCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                const docId = card.getAttribute('data-doctor-id');
+                const doctorsList = doctorsDB[selectedSpecialty.id];
+                selectedDoctor = doctorsList.find(d => d.id === docId);
+                enableNext();
+            });
+        });
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (selectedDoctor) {
+                    currentStep = 2;
+                    renderWizard();
+                }
+            });
+        }
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                currentStep = 0;
+                renderWizard();
+            });
+        }
+        enableNext();
+    }
+
+    function attachTimeEvents() {
+        const slots = document.querySelectorAll('.time-slot');
+        const nextBtn = document.getElementById('nextBtn2');
+        const backBtn = document.getElementById('backBtn2');
+
+        function enableNext() {
+            if (nextBtn) nextBtn.disabled = !selectedTime;
+        }
+
+        slots.forEach(slot => {
+            slot.addEventListener('click', () => {
+                slots.forEach(s => s.classList.remove('selected'));
+                slot.classList.add('selected');
+                selectedTime = slot.getAttribute('data-time');
+                enableNext();
+            });
+        });
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (selectedTime) {
+                    currentStep = 3;
+                    renderWizard();
+                }
+            });
+        }
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                currentStep = 1;
+                renderWizard();
+            });
+        }
+        enableNext();
+    }
+
+    function attachConfirmEvents() {
+        const confirmButton = document.getElementById('confirmBtn');
+        const backBtn = document.getElementById('backBtn3');
+        const successDiv = document.getElementById('successMessage');
+
+        if (confirmButton) {
+            confirmButton.addEventListener('click', () => {
+                // final confirmation - show success & reset? we keep friendly message
+                if (successDiv) {
+                    successDiv.innerHTML = `<div class="success-message"><i class="fas fa-check-circle"></i> Appointment confirmed! You'll receive a reminder. Thank you for trusting HealthSync.</div>`;
+                    confirmButton.disabled = true;
+                    confirmButton.textContent = "✓ Booked";
+                    // optional: after 2 sec disable success but we keep friendly
+                    setTimeout(() => {
+                        // just for UX we keep message visible but allow back? better do not reset state to avoid confusion
+                    }, 100);
+                }
+                // also you could add a small animation but it's clean
+            });
+        }
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                currentStep = 2;
+                renderWizard();
+            });
+        }
+    }
+
+    function updateStepIndicator() {
+        const steps = document.querySelectorAll('.step-item');
+        steps.forEach((step, idx) => {
+            step.classList.remove('active', 'completed');
+            if (idx < currentStep) {
+                step.classList.add('completed');
+            } else if (idx === currentStep) {
+                step.classList.add('active');
+            }
+        });
+        // also if confirmation step (3) completed visually, but we just keep
+        if (currentStep === 3) {
+            steps[3]?.classList.add('active');
+        }
+    }
+
+    // initial render
+    renderWizard();
+</script>
+</body>
+</html>
